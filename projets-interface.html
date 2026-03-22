@@ -14,13 +14,35 @@
             color: #1a202c;
         }
         .container { max-width: 800px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            gap: 20px;
+        }
         h1 { 
             text-align: center; 
             color: #000;
-            margin-bottom: 60px;
             font-size: clamp(28px, 6vw, 48px);
             font-weight: 900;
             letter-spacing: -1px;
+            flex: 1;
+        }
+        .mode-toggle {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .mode-toggle:hover {
+            background: #222;
         }
         .projects-list { 
             display: flex;
@@ -198,6 +220,19 @@
             border-color: #000;
             box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
         }
+        .link-item a {
+            flex: 1;
+            min-width: 80px;
+            color: #0066cc;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .link-item a:hover {
+            text-decoration: underline;
+        }
         .link-item button { 
             background: #fff;
             color: #999;
@@ -233,6 +268,19 @@
             outline: none;
             border-color: #000;
             box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        .note-display {
+            background: #fff;
+            border: 1px solid #d9d9e0;
+            color: #000;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            min-height: 50px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
         }
         .btn-add { 
             background: #000;
@@ -282,17 +330,21 @@
         .btn-save:hover { 
             background: #222;
         }
+        .hidden { display: none; }
 
         @media (max-width: 768px) {
             body { padding: 40px 15px; }
-            h1 { margin-bottom: 40px; }
+            .header { flex-direction: column; }
+            h1 { margin-bottom: 0; }
             .project-header { padding: 14px 20px; }
             .project-body { padding: 20px; }
         }
         
         @media (max-width: 480px) {
             body { padding: 30px 12px; }
-            h1 { margin-bottom: 30px; font-size: 28px; }
+            .header { margin-bottom: 40px; }
+            h1 { margin-bottom: 0; font-size: 28px; }
+            .mode-toggle { padding: 8px 12px; font-size: 12px; }
             .project-header { padding: 12px 16px; }
             .project-body { padding: 16px; }
             .header-left { gap: 10px; }
@@ -303,11 +355,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>Projects</h1>
+        <div class="header">
+            <h1>Projects</h1>
+            <button class="mode-toggle" onclick="toggle_mode()">📝 Edit</button>
+        </div>
         <div class="projects-list" id="projects"></div>
     </div>
 
     <script>
+        let editMode = true;
         let projectsData = [
             {
                 name: "Edf-Offer-UI",
@@ -374,6 +430,12 @@
             }
         ];
 
+        function toggle_mode() {
+            editMode = !editMode;
+            sauvegarder();
+            afficher();
+        }
+
         function charger() {
             const saved = localStorage.getItem('projets');
             if (saved) {
@@ -383,7 +445,6 @@
 
         function sauvegarder() {
             localStorage.setItem('projets', JSON.stringify(projectsData));
-            alert('Sauvegardé !');
         }
 
         function toggle_projet(idx) {
@@ -439,6 +500,9 @@
 
         function afficher() {
             const container = document.getElementById('projects');
+            const modeBtn = document.querySelector('.mode-toggle');
+            
+            modeBtn.textContent = editMode ? '👁️ View' : '📝 Edit';
             
             // Trier : épinglés en haut
             const sorted = [...projectsData].sort((a, b) => {
@@ -491,26 +555,35 @@
                                 <div class="section-title">Links</div>
                                 ${p.links.map((l, lIdx) => `
                                     <div class="link-item">
-                                        <input type="text" placeholder="Label" value="${l.label}" onchange="mettre_a_jour_lien(${idx}, ${lIdx}, 'label', this.value)">
-                                        <input type="text" placeholder="URL" value="${l.url}" onchange="mettre_a_jour_lien(${idx}, ${lIdx}, 'url', this.value)" style="flex: 2;">
-                                        <button onclick="supprimer_lien(${idx}, ${lIdx})">×</button>
+                                        ${editMode ? `
+                                            <input type="text" placeholder="Label" value="${l.label}" onchange="mettre_a_jour_lien(${idx}, ${lIdx}, 'label', this.value)">
+                                            <input type="text" placeholder="URL" value="${l.url}" onchange="mettre_a_jour_lien(${idx}, ${lIdx}, 'url', this.value)" style="flex: 2;">
+                                            <button onclick="supprimer_lien(${idx}, ${lIdx})">×</button>
+                                        ` : `
+                                            <span style="font-weight: 600; color: #666;">${l.label}</span>
+                                            ${l.url ? `<a href="${l.url}" target="_blank">${l.url}</a>` : ''}
+                                        `}
                                     </div>
                                 `).join('')}
-                                <button class="btn-add" onclick="ajouter_lien(${idx})">+ Add Link</button>
+                                ${editMode ? `<button class="btn-add" onclick="ajouter_lien(${idx})">+ Add Link</button>` : ''}
                             </div>
                             
                             <div class="section">
                                 <div class="section-title">Notes</div>
                                 ${p.notes.map((n, nIdx) => `
                                     <div class="note-item">
-                                        <textarea class="note-input" placeholder="Add a note..." onchange="mettre_a_jour_note(${idx}, ${nIdx}, this.value)">${n}</textarea>
-                                        <button class="btn-remove" onclick="supprimer_note(${idx}, ${nIdx})">Remove</button>
+                                        ${editMode ? `
+                                            <textarea class="note-input" placeholder="Add a note..." onchange="mettre_a_jour_note(${idx}, ${nIdx}, this.value)">${n}</textarea>
+                                            <button class="btn-remove" onclick="supprimer_note(${idx}, ${nIdx})">Remove</button>
+                                        ` : `
+                                            <div class="note-display">${n}</div>
+                                        `}
                                     </div>
                                 `).join('')}
-                                <button class="btn-add" onclick="ajouter_note(${idx})">+ Add Note</button>
+                                ${editMode ? `<button class="btn-add" onclick="ajouter_note(${idx})">+ Add Note</button>` : ''}
                             </div>
                             
-                            <button class="btn-save" onclick="sauvegarder()">Save</button>
+                            ${editMode ? `<button class="btn-save" onclick="sauvegarder()">Save</button>` : ''}
                         </div>
                     </div>
                 </div>
