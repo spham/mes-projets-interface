@@ -5,218 +5,520 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes Projets</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        body { background: #1e293b; color: #f1f5f9; padding: 20px; }
-        h1 { text-align: center; margin-bottom: 30px; color: #38bdf8; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 60px 20px;
+            color: #1a202c;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { 
+            text-align: center; 
+            color: #000;
+            margin-bottom: 60px;
+            font-size: clamp(28px, 6vw, 48px);
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+        .projects-list { 
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .pinned-section {
+            margin-bottom: 24px;
+        }
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
         .project-card {
-            background: #334155;
+            background: #f9f9fb;
+            border: 1.5px solid #e6e6eb;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+        .project-card:hover {
+            border-color: #000;
+            background: #fcfcfd;
+        }
+        .project-card.pinned {
+            border-color: #ffb800;
+            background: #fffdf0;
+        }
+        .project-card.liked {
+            border-color: #ff6b9d;
+        }
+        .project-header { 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 24px;
+            cursor: pointer;
+            user-select: none;
+            gap: 12px;
+            background: #f9f9fb;
+            transition: background 0.25s ease;
+        }
+        .project-header:hover {
+            background: #f3f3f6;
+        }
+        .project-card.pinned .project-header {
+            background: #fffdf0;
+        }
+        .project-card.liked .project-header {
+            background: #fff5fa;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
+        }
+        .toggle-icon {
+            font-size: 14px;
+            transition: transform 0.25s ease;
+            flex-shrink: 0;
+            color: #666;
+        }
+        .toggle-icon.open {
+            transform: rotate(90deg);
+        }
+        .project-name { 
+            font-size: clamp(14px, 3vw, 16px);
+            font-weight: 600;
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #000;
+        }
+        .header-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .icon-btn {
+            background: transparent;
+            border: none;
+            padding: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover {
+            transform: scale(1.2);
+        }
+        .icon-btn.active {
+            color: #ff6b9d;
+        }
+        .badge { 
+            background: #e6e6eb;
+            color: #666;
+            padding: 4px 10px;
             border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
-        .project-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .project-title { color: #38bdf8; font-size: 24px; font-weight: bold; flex: 1; }
-        .platform-badge { background: #475569; color: #e2e8f0; padding: 4px 12px; border-radius: 20px; font-size: 14px; margin-left: 10px; }
-        .project-description { color: #94a3b8; margin-bottom: 15px; }
-        .section-title { color: #e2e8f0; font-weight: bold; margin: 10px 0 5px 0; }
-        textarea {
-            width: 100%;
-            padding: 10px;
+        .project-content { 
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .project-content.open {
+            max-height: 2000px;
+        }
+        .project-body {
+            padding: 24px;
+            border-top: 1px solid #e6e6eb;
+            background: #fafafa;
+        }
+        .project-card.pinned .project-body {
+            background: #fffef8;
+        }
+        .project-card.liked .project-body {
+            background: #fff9fc;
+        }
+        .project-desc { 
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .section { 
+            margin-bottom: 24px;
+        }
+        .section-title { 
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .link-item { 
+            margin-bottom: 8px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .link-item input { 
+            flex: 1;
+            min-width: 80px;
+            background: #fff;
+            border: 1px solid #d9d9e0;
+            color: #000;
+            padding: 8px 12px;
             border-radius: 6px;
-            border: 1px solid #475569;
-            background: #1e293b;
-            color: #f1f5f9;
-            margin-bottom: 10px;
-            min-height: 60px;
-            font-family: monospace;
+            font-size: 12px;
+            transition: all 0.2s ease;
         }
-        textarea:focus { outline: 2px solid #38bdf8; }
-        .link-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-        .link-row input { flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #475569; background: #1e293b; color: #f1f5f9; }
-        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
-        .btn-add { background: #475569; color: #e2e8f0; }
-        .btn-save { background: #38bdf8; color: #1e293b; width: 100%; margin-top: 10px; }
-        .btn-save:hover { background: #0ea5e9; }
-        .field-group { margin-bottom: 15px; }
-        .links-list { margin-top: 5px; }
+        .link-item input:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        .link-item button { 
+            background: #fff;
+            color: #999;
+            border: 1px solid #d9d9e0;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        .link-item button:hover { 
+            border-color: #666;
+            color: #666;
+        }
+        .note-item { 
+            margin-bottom: 8px;
+        }
+        .note-input { 
+            width: 100%;
+            background: #fff;
+            border: 1px solid #d9d9e0;
+            color: #000;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            min-height: 50px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            transition: all 0.2s ease;
+            resize: vertical;
+        }
+        .note-input:focus { 
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-add { 
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 6px;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        .btn-add:hover { 
+            background: #222;
+        }
+        .btn-remove { 
+            background: #fff;
+            color: #666;
+            border: 1px solid #d9d9e0;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            width: 100%;
+            margin-top: 4px;
+            transition: all 0.2s ease;
+        }
+        .btn-remove:hover { 
+            border-color: #999;
+            color: #999;
+        }
+        .btn-save { 
+            background: #000;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 16px;
+            transition: all 0.2s ease;
+        }
+        .btn-save:hover { 
+            background: #222;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 40px 15px; }
+            h1 { margin-bottom: 40px; }
+            .project-header { padding: 14px 20px; }
+            .project-body { padding: 20px; }
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 30px 12px; }
+            h1 { margin-bottom: 30px; font-size: 28px; }
+            .project-header { padding: 12px 16px; }
+            .project-body { padding: 16px; }
+            .header-left { gap: 10px; }
+            .link-item input { padding: 6px 10px; font-size: 11px; }
+            .note-input { padding: 8px 10px; min-height: 40px; font-size: 11px; }
+        }
     </style>
 </head>
 <body>
-    <h1>📁 Mes Projets</h1>
-    <div class="container" id="projects-container"></div>
+    <div class="container">
+        <h1>Projects</h1>
+        <div class="projects-list" id="projects"></div>
+    </div>
 
     <script>
-        const projects = [
+        let projectsData = [
             {
                 name: "Edf-Offer-UI",
                 platform: "GitLab",
-                description: "Interface React pour la gestion des offres EDF",
+                desc: "Interface React pour la gestion des offres EDF",
                 links: [
                     { label: "Repo", url: "https://gitlab.com/spham/Edf-Offer-UI" },
                     { label: "Preview", url: "" }
                 ],
-                notes: [
-                    "16 commits hier",
-                    "Export DOCX implémenté",
-                    "Diagrammes Mermaid"
-                ]
+                notes: ["16 commits hier", "Export DOCX", "Diagrammes Mermaid"],
+                open: false,
+                pinned: false,
+                liked: false
             },
             {
                 name: "devtra",
                 platform: "GitHub",
-                description: "Projet personnel en développement",
-                links: [
-                    { label: "Repo", url: "https://github.com/spham/devtra" }
-                ],
-                notes: [
-                    "Dernier push : 19 mars",
-                    "Projet privé"
-                ]
-            },
-            {
-                name: "ticketbeast",
-                platform: "GitHub",
-                description: "Backend pour la gestion de billetterie",
-                links: [
-                    { label: "Repo", url: "https://github.com/nothingworksinc/ticketbeast" }
-                ],
-                notes: [
-                    "Laravel project"
-                ]
-            },
-            {
-                name: "pastemd",
-                platform: "GitHub",
-                description: "Tool pour copier/coller du texte",
-                links: [
-                    { label: "Repo", url: "https://github.com/spham/pastemd" }
-                ],
-                notes: [
-                    "Push récent : 9 mars"
-                ]
+                desc: "Projet personnel en développement",
+                links: [{ label: "Repo", url: "https://github.com/spham/devtra" }],
+                notes: ["Push: 19 mars", "Privé"],
+                open: false,
+                pinned: false,
+                liked: false
             },
             {
                 name: "testing-laravel-blog-pest",
                 platform: "GitHub",
-                description: "Blog Laravel avec tests Pest",
-                links: [
-                    { label: "Repo", url: "https://github.com/spham/testing-laravel-blog-pest" }
-                ],
-                notes: [
-                    ""
-                ]
+                desc: "Blog Laravel avec tests Pest",
+                links: [{ label: "Repo", url: "https://github.com/spham/testing-laravel-blog-pest" }],
+                notes: ["Laravel + Pest"],
+                open: false,
+                pinned: false,
+                liked: false
+            },
+            {
+                name: "ticketbeast",
+                platform: "GitHub",
+                desc: "Backend billetterie",
+                links: [{ label: "Repo", url: "https://github.com/nothingworksinc/ticketbeast" }],
+                notes: ["Laravel project"],
+                open: false,
+                pinned: false,
+                liked: false
+            },
+            {
+                name: "pastemd",
+                platform: "GitHub",
+                desc: "Tool pour copier/coller du texte",
+                links: [{ label: "Repo", url: "https://github.com/spham/pastemd" }],
+                notes: ["Push: 9 mars"],
+                open: false,
+                pinned: false,
+                liked: false
+            },
+            {
+                name: "databricks-2026",
+                platform: "GitHub",
+                desc: "Dossier formation Databricks",
+                links: [{ label: "Repo", url: "https://github.com/spham/databricks-2026" }],
+                notes: ["Formation Databricks 2026"],
+                open: false,
+                pinned: false,
+                liked: false
             }
         ];
 
-        function saveToLocalStorage() {
-            localStorage.setItem('myProjects', JSON.stringify(projects));
-        }
-
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('myProjects');
+        function charger() {
+            const saved = localStorage.getItem('projets');
             if (saved) {
-                return JSON.parse(saved);
+                projectsData = JSON.parse(saved);
             }
-            return projects;
         }
 
-        function renderProjects() {
-            const container = document.getElementById('projects-container');
-            container.innerHTML = '';
+        function sauvegarder() {
+            localStorage.setItem('projets', JSON.stringify(projectsData));
+            alert('Sauvegardé !');
+        }
 
-            loadFromLocalStorage().forEach((project, pIndex) => {
-                const card = document.createElement('div');
-                card.className = 'project-card';
+        function toggle_projet(idx) {
+            projectsData[idx].open = !projectsData[idx].open;
+            afficher();
+        }
 
-                let linksHtml = '';
-                project.links.forEach((link, lIndex) => {
-                    linksHtml += `
-                        <div class="link-row">
-                            <input type="text" value="${link.label}" placeholder="Label" data-p="${pIndex}-l${lIndex}-label" onchange="updateData()">
-                            <input type="text" value="${link.url}" placeholder="URL" data-p="${pIndex}-l${lIndex}-url" onchange="updateData()">
+        function toggle_pin(idx, e) {
+            e.stopPropagation();
+            projectsData[idx].pinned = !projectsData[idx].pinned;
+            sauvegarder();
+            afficher();
+        }
+
+        function toggle_like(idx, e) {
+            e.stopPropagation();
+            projectsData[idx].liked = !projectsData[idx].liked;
+            sauvegarder();
+            afficher();
+        }
+
+        function ajouter_lien(idx) {
+            projectsData[idx].links.push({ label: "", url: "" });
+            afficher();
+        }
+
+        function ajouter_note(idx) {
+            projectsData[idx].notes.push("");
+            afficher();
+        }
+
+        function supprimer_lien(idx, lIdx) {
+            projectsData[idx].links.splice(lIdx, 1);
+            afficher();
+        }
+
+        function supprimer_note(idx, nIdx) {
+            projectsData[idx].notes.splice(nIdx, 1);
+            afficher();
+        }
+
+        function mettre_a_jour_lien(idx, lIdx, type, val) {
+            if (type === 'label') {
+                projectsData[idx].links[lIdx].label = val;
+            } else {
+                projectsData[idx].links[lIdx].url = val;
+            }
+        }
+
+        function mettre_a_jour_note(idx, nIdx, val) {
+            projectsData[idx].notes[nIdx] = val;
+        }
+
+        function afficher() {
+            const container = document.getElementById('projects');
+            
+            // Trier : épinglés en haut
+            const sorted = [...projectsData].sort((a, b) => {
+                if (a.pinned === b.pinned) return 0;
+                return a.pinned ? -1 : 1;
+            });
+
+            let html = '';
+            
+            // Section épinglés
+            const pinned = sorted.filter(p => p.pinned);
+            if (pinned.length > 0) {
+                html += '<div class="pinned-section"><div class="section-label">📌 Épinglés</div>';
+                html += pinned.map((p, idx) => renderProject(projectsData.indexOf(p))).join('');
+                html += '</div>';
+            }
+            
+            // Section autres
+            const unpinned = sorted.filter(p => !p.pinned);
+            if (unpinned.length > 0) {
+                html += '<div class="pinned-section"><div class="section-label">Autres</div>';
+                html += unpinned.map((p, idx) => renderProject(projectsData.indexOf(p))).join('');
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function renderProject(idx) {
+            const p = projectsData[idx];
+            return `
+                <div class="project-card ${p.pinned ? 'pinned' : ''} ${p.liked ? 'liked' : ''}">
+                    <div class="project-header" onclick="toggle_projet(${idx})">
+                        <div class="header-left">
+                            <span class="toggle-icon ${p.open ? 'open' : ''}">►</span>
+                            <div class="project-name">${p.name}</div>
                         </div>
-                    `;
-                });
-                linksHtml += `<button class="btn btn-add" onclick="addLink(${pIndex})">➕ Lien</button>`;
-
-                let notesHtml = '';
-                project.notes.forEach((note, nIndex) => {
-                    notesHtml += `
-                        <textarea data-p="${pIndex}-n${nIndex}" onchange="updateData()">${note}</textarea>
-                    `;
-                });
-                notesHtml += `<button class="btn btn-add" onclick="addNote(${pIndex})">➕ Note</button>`;
-
-                card.innerHTML = `
-                    <div class="project-header">
-                        <div class="project-title">${project.name}</div>
-                        <div class="platform-badge">${project.platform}</div>
-                    </div>
-                    <div class="project-description">${project.description}</div>
-                    
-                    <div class="field-group">
-                        <div class="section-title">🔗 Liens</div>
-                        <div class="links-list">${linksHtml}</div>
+                        <div class="header-right">
+                            <button class="icon-btn ${p.liked ? 'active' : ''}" onclick="toggle_like(${idx}, event)" title="Like">${p.liked ? '❤️' : '🤍'}</button>
+                            <button class="icon-btn" onclick="toggle_pin(${idx}, event)" title="Pin">${p.pinned ? '📌' : '📍'}</button>
+                            <div class="badge">${p.platform}</div>
+                        </div>
                     </div>
                     
-                    <div class="field-group">
-                        <div class="section-title">📝 Notes</div>
-                        <div class="links-list">${notesHtml}</div>
+                    <div class="project-content ${p.open ? 'open' : ''}">
+                        <div class="project-body">
+                            <div class="project-desc">${p.desc}</div>
+                            
+                            <div class="section">
+                                <div class="section-title">Links</div>
+                                ${p.links.map((l, lIdx) => `
+                                    <div class="link-item">
+                                        <input type="text" placeholder="Label" value="${l.label}" onchange="mettre_a_jour_lien(${idx}, ${lIdx}, 'label', this.value)">
+                                        <input type="text" placeholder="URL" value="${l.url}" onchange="mettre_a_jour_lien(${idx}, ${lIdx}, 'url', this.value)" style="flex: 2;">
+                                        <button onclick="supprimer_lien(${idx}, ${lIdx})">×</button>
+                                    </div>
+                                `).join('')}
+                                <button class="btn-add" onclick="ajouter_lien(${idx})">+ Add Link</button>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-title">Notes</div>
+                                ${p.notes.map((n, nIdx) => `
+                                    <div class="note-item">
+                                        <textarea class="note-input" placeholder="Add a note..." onchange="mettre_a_jour_note(${idx}, ${nIdx}, this.value)">${n}</textarea>
+                                        <button class="btn-remove" onclick="supprimer_note(${idx}, ${nIdx})">Remove</button>
+                                    </div>
+                                `).join('')}
+                                <button class="btn-add" onclick="ajouter_note(${idx})">+ Add Note</button>
+                            </div>
+                            
+                            <button class="btn-save" onclick="sauvegarder()">Save</button>
+                        </div>
                     </div>
-                    
-                    <button class="btn btn-save" onclick="saveProject(${pIndex})">💾 Sauvegarder</button>
-                `;
-
-                container.appendChild(card);
-            });
+                </div>
+            `;
         }
 
-        function updateData() {
-            const allProjects = loadFromLocalStorage();
-            document.querySelectorAll('input[data-p], textarea[data-p]').forEach(el => {
-                const parts = el.dataset.p.split('-');
-                const pIndex = parseInt(parts[0]);
-                const type = parts[1];
-                const index = parseInt(parts[2]);
-
-                if (type === 'l') {
-                    if (!allProjects[pIndex].links[index]) {
-                        allProjects[pIndex].links[index] = {};
-                    }
-                    if (parts[3] === 'label') {
-                        allProjects[pIndex].links[index].label = el.value;
-                    } else if (parts[3] === 'url') {
-                        allProjects[pIndex].links[index].url = el.value;
-                    }
-                } else if (type === 'n') {
-                    allProjects[pIndex].notes[index] = el.value;
-                }
-            });
-            saveToLocalStorage();
-        }
-
-        function addLink(pIndex) {
-            const allProjects = loadFromLocalStorage();
-            allProjects[pIndex].links.push({ label: "", url: "" });
-            saveToLocalStorage();
-            renderProjects();
-        }
-
-        function addNote(pIndex) {
-            const allProjects = loadFromLocalStorage();
-            allProjects[pIndex].notes.push("");
-            saveToLocalStorage();
-            renderProjects();
-        }
-
-        function saveProject(pIndex) {
-            updateData();
-            alert(`Projet "${loadFromLocalStorage()[pIndex].name}" sauvegardé !`);
-        }
-
-        renderProjects();
+        charger();
+        afficher();
     </script>
 </body>
 </html>
