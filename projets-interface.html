@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Projets</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+        body { background: #1e293b; color: #f1f5f9; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 30px; color: #38bdf8; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .project-card {
+            background: #334155;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .project-title { color: #38bdf8; font-size: 24px; margin-bottom: 10px; }
+        .project-details { color: #94a3b8; margin-bottom: 20px; }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: #f1f5f9;
+            margin-bottom: 15px;
+            min-height: 80px;
+            font-family: monospace;
+        }
+        textarea:focus { outline: 2px solid #38bdf8; }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary { background: #38bdf8; color: #1e293b; }
+        .btn-primary:hover { background: #0ea5e9; }
+        .link-section { margin-bottom: 15px; }
+        .link-section label { display: block; margin-bottom: 5px; color: #e2e8f0; }
+        .link-input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>📁 Mes Projets</h1>
+    <div class="container" id="projects-container"></div>
+
+    <script>
+        const projects = [
+            {
+                name: "Edf-Offer-UI",
+                platform: "GitLab",
+                url: "https://gitlab.com/spham/Edf-Offer-UI",
+                description: "Interface React pour la gestion des offres EDF",
+                notes: ""
+            },
+            {
+                name: "devtra",
+                platform: "GitHub",
+                url: "https://github.com/spham/devtra",
+                description: "Projet personnel en développement",
+                notes: ""
+            },
+            {
+                name: "ticketbeast",
+                platform: "GitHub",
+                url: "https://github.com/nothingworksinc/ticketbeast",
+                description: "Backend pour la gestion de billetterie",
+                notes: ""
+            },
+            {
+                name: "pastemd",
+                platform: "GitHub",
+                url: "https://github.com/spham/pastemd",
+                description: "Tool pour copier/coller du texte",
+                notes: ""
+            },
+            {
+                name: "testing-laravel-blog-pest",
+                platform: "GitHub",
+                url: "https://github.com/spham/testing-laravel-blog-pest",
+                description: "Blog Laravel avec tests Pest",
+                notes: ""
+            },
+            {
+                name: "claude-skill-workspace",
+                platform: "GitHub",
+                url: "https://github.com/spham/claude-skill-workspace",
+                description: "Claude Code skills",
+                notes: ""
+            }
+        ];
+
+        function saveToLocalStorage() {
+            localStorage.setItem('myProjects', JSON.stringify(projects));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('myProjects');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return projects;
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = '';
+
+            loadFromLocalStorage().forEach((project, index) => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+
+                card.innerHTML = `
+                    <div class="project-title">
+                        ${project.name} <span style="font-size: 16px; color: #64748b;">${project.platform}</span>
+                    </div>
+                    <div class="project-details">
+                        ${project.url ? `🔗 <a href="${project.url}" target="_blank">${project.url}</a>` : ''}
+                    </div>
+                    <div class="link-section">
+                        <label>📝 Notes :</label>
+                        <textarea id="notes-${index}" placeholder="Ajoutez vos notes ici...">${project.notes || ''}</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveNote(${index})">💾 Sauvegarder</button>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function saveNote(index) {
+            const note = document.getElementById(`notes-${index}`).value;
+            const allProjects = loadFromLocalStorage();
+            allProjects[index].notes = note;
+            saveToLocalStorage();
+            alert('Notes sauvegardées !');
+        }
+
+        renderProjects();
+    </script>
+</body>
+</html>
